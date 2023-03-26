@@ -1,24 +1,50 @@
-extern crate csv;
-
-use std::error::Error;
+use config::Config;
 use csv::Reader;
+use data::DataSet;
+use linear_regression::LinearRegression;
+use utils::get_file_contents;
+use std::{path::PathBuf, fs::File};
 
-fn main() {
-	let f = example();
+use crate::data::DataRecord;
 
-	match f {
-		Err(e) => {
-			println!("file not found \n{:?}",e);   //handled error
-		}
-		_ => {},
-	 }
+pub mod config;
+pub mod utils;
+pub mod data;
+pub mod linear_regression;
+
+#[derive(Debug, clap::Parser)]
+pub struct Options {
+    /// Path to the config file.
+    #[clap(long, short)]
+    #[clap(required = true)]
+    config: PathBuf,
 }
 
-fn example() -> Result<(), Box<dyn Error>> {
-    let mut rdr = Reader::from_path("/Users/tuanperera/Documents/42/linear_regression/src/data/data.csv")?;
-    for result in rdr.records() {
-        let record = result?;
-        println!("{:?}", record);
+fn main() {
+    if let Err(()) = do_main(clap::Parser::parse()) {
+        std::process::exit(1)
     }
+}
+
+fn do_main(options: Options) -> Result<(), ()> {
+	let file_contents = get_file_contents(&options.config)?;
+    let config: Config = serde_yaml::from_str(&file_contents).map_err(|e| tracing::error!("Error parsing config file: {e}"))?;
+    
+	let rdr = Reader::from_path(config.path).map_err(|e| tracing::error!("Error reading file: {e}"))?;
+
+	let data = get_vector_of_data_records(rdr)?;
+
+	let data = DataSet::new(data);
+
+	let linear_regression = LinearRegression::new(data);
     Ok(())
+}
+
+fn get_vector_of_data_records(mut rdr: Reader<File>) -> Result<Vec<DataRecord>, ()> {
+	let mut data = Vec::new();
+	for result in rdr.deserialize() {
+		let record: DataRecord = result.map_err(|e| tracing::error!("Error deserializing record: {e}"))?;
+		data.push(record);
+	}
+	Ok(data)
 }
