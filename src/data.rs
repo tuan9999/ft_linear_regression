@@ -1,3 +1,6 @@
+use std::fs::File;
+
+use csv::Reader;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Clone)]
@@ -28,4 +31,13 @@ impl IntoIterator for DataSet {
 	fn into_iter(self) -> Self::IntoIter {
 		self.data.into_iter()
 	}
+}
+
+pub fn get_vector_of_data_records(mut rdr: Reader<File>) -> Result<Vec<DataRecord>, ()> {
+	let mut data = Vec::new();
+	for result in rdr.deserialize() {
+		let record: DataRecord = result.map_err(|e| tracing::error!("Error deserializing record: {e}"))?;
+		data.push(record);
+	}
+	Ok(data)
 }

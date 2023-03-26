@@ -69,4 +69,13 @@ impl LinearRegression {
 		save_contents_to_file(&path, &file_contents)?;
 		Ok(())
 	}
+
+	pub fn set_thetas(&mut self, theta_zero: f64, theta_one: f64) {
+		self.theta_zero = theta_zero;
+		self.theta_one = theta_one;
+	}
+
+	pub fn predict(&self, x: f64) -> f64 {
+		self.hypothesis(x)
+	}
 }

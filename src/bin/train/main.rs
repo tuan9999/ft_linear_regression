@@ -1,17 +1,10 @@
 use config::Config;
 use csv::Reader;
-use data::DataSet;
-use linear_regression::LinearRegression;
+use ft_linear_regression::{utils::get_file_contents, data::{DataSet, get_vector_of_data_records}, linear_regression::LinearRegression};
 use tracing::Level;
-use utils::get_file_contents;
-use std::{path::PathBuf, fs::File};
-
-use crate::data::DataRecord;
+use std::path::PathBuf;
 
 pub mod config;
-pub mod utils;
-pub mod data;
-pub mod linear_regression;
 
 #[derive(Debug, clap::Parser)]
 pub struct Options {
@@ -47,13 +40,4 @@ fn do_main(options: Options) -> Result<(), ()> {
 
 	linear_regression.save_thetas_to_file(&config.path_to_save_thetas_file)?;
     Ok(())
-}
-
-fn get_vector_of_data_records(mut rdr: Reader<File>) -> Result<Vec<DataRecord>, ()> {
-	let mut data = Vec::new();
-	for result in rdr.deserialize() {
-		let record: DataRecord = result.map_err(|e| tracing::error!("Error deserializing record: {e}"))?;
-		data.push(record);
-	}
-	Ok(data)
 }
