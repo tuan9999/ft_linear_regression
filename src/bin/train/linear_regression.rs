@@ -57,7 +57,7 @@ impl LinearRegression {
 			let temp_one = theta_one - self.alpha * self.cost(false);
 			theta_zero = temp_zero;
 			theta_one = temp_one;
-			tracing::info!("iteration: {i}\ntheta_zero: {}\ntheta_one: {}", self.theta_zero, self.theta_one);
+			tracing::info!("iteration: {i}\ntheta_zero: {}\ntheta_one: {}", theta_zero, theta_one);
 		}
 		self.theta_zero = theta_zero;
 		self.theta_one = theta_one;

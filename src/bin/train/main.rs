@@ -2,6 +2,7 @@ use config::Config;
 use csv::Reader;
 use data::DataSet;
 use linear_regression::LinearRegression;
+use tracing::Level;
 use utils::get_file_contents;
 use std::{path::PathBuf, fs::File};
 
@@ -27,6 +28,10 @@ fn main() {
 }
 
 fn do_main(options: Options) -> Result<(), ()> {
+	tracing_subscriber::fmt()
+        .with_max_level(Level::DEBUG)
+        .init();
+
 	let file_contents = get_file_contents(&options.config)?;
     let config: Config = serde_yaml::from_str(&file_contents).map_err(|e| tracing::error!("Error parsing config file: {e}"))?;
     
