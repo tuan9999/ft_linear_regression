@@ -1,3 +1,5 @@
+#![allow(clippy::result_unit_err)]
+
 use std::{
     fs::File,
     io::{Read, Write},

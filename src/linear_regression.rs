@@ -1,3 +1,5 @@
+#![allow(clippy::result_unit_err)]
+
 use plotters::prelude::*;
 use std::path::{Path, PathBuf};
 
