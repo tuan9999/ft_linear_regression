@@ -27,6 +27,21 @@ impl LinearRegression {
 		}
 	}
 
+	pub fn save_thetas_to_file(&self, path: &Path) -> Result<(), ()> {
+		let file_contents = format!("theta_zero: {}\ntheta_one: {}", self.theta_zero, self.theta_one);
+		save_contents_to_file(&path, &file_contents)?;
+		Ok(())
+	}
+
+	pub fn set_thetas(&mut self, theta_zero: f64, theta_one: f64) {
+		self.theta_zero = theta_zero;
+		self.theta_one = theta_one;
+	}
+
+	pub fn predict(&self, x: f64) -> f64 {
+		self.hypothesis(x)
+	}
+
 	pub fn train(&mut self) {
 		self.gradient_descent();
 	}
@@ -62,20 +77,5 @@ impl LinearRegression {
 		self.theta_zero = theta_zero;
 		self.theta_one = theta_one;
 		tracing::info!("theta_zero_final_value: {}\ntheta_one_final_value: {}", self.theta_zero, self.theta_one)
-	}
-
-	pub fn save_thetas_to_file(&self, path: &Path) -> Result<(), ()> {
-		let file_contents = format!("theta_zero: {}\ntheta_one: {}", self.theta_zero, self.theta_one);
-		save_contents_to_file(&path, &file_contents)?;
-		Ok(())
-	}
-
-	pub fn set_thetas(&mut self, theta_zero: f64, theta_one: f64) {
-		self.theta_zero = theta_zero;
-		self.theta_one = theta_one;
-	}
-
-	pub fn predict(&self, x: f64) -> f64 {
-		self.hypothesis(x)
 	}
 }
