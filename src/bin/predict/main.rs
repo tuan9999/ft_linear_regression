@@ -13,6 +13,10 @@ pub struct Options {
     #[clap(long, short)]
     #[clap(required = true)]
     config: PathBuf,
+
+	#[clap(long, short)]
+    #[clap(required = true)]
+    graph: bool,
 }
 
 fn main() {
@@ -44,6 +48,10 @@ fn do_main(options: Options) -> Result<(), ()> {
 	for record in data {
 		let prediction = linear_regression.predict(record.km);
 		tracing::info!("Predicted price: {}, actual price: {}", prediction, record.price);
+	}
+
+	if options.graph {
+		linear_regression.plot_data()?;
 	}
 	Ok(())
 }

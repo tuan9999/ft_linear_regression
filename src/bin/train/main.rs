@@ -12,6 +12,10 @@ pub struct Options {
     #[clap(long, short)]
     #[clap(required = true)]
     config: PathBuf,
+
+	#[clap(long, short)]
+    #[clap(required = true)]
+    graph: bool,
 }
 
 fn main() {
@@ -40,5 +44,8 @@ fn do_main(options: Options) -> Result<(), ()> {
 
 	linear_regression.save_thetas_to_file(&config.path_to_save_thetas_file)?;
 
-	linear_regression.plot_data()
+	if options.graph {
+		linear_regression.plot_data()?;
+	}
+	Ok(())
 }
