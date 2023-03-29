@@ -6,4 +6,5 @@ pub struct Config {
 	pub path: PathBuf,
 	pub path_to_save_thetas_file: PathBuf,
 	pub gradient_descent_iterations: usize,
+	pub graph_path: PathBuf,
 }

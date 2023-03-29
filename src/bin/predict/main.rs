@@ -38,7 +38,7 @@ fn do_main(options: Options) -> Result<(), ()> {
 
 	let data = DataSet::new(data);
 
-	let mut linear_regression = ft_linear_regression::linear_regression::LinearRegression::new(data.clone(), None, 0);
+	let mut linear_regression = ft_linear_regression::linear_regression::LinearRegression::new(data.clone(), None, 0, config.graph_path);
 	linear_regression.set_thetas(thetas.theta_zero, thetas.theta_one);
 
 	for record in data {

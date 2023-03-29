@@ -22,6 +22,40 @@ impl DataSet {
 	pub fn len(&self) -> usize {
 		self.data.len()
 	}
+
+	pub fn get_max_value(&self, is_km: bool) -> f64 {
+		let mut max = 0.0;
+		for record in self.data.clone() {
+			if is_km && record.km > max {
+				max = record.km;
+			} else if record.price > max {
+				max = record.price;
+			}
+		}
+		tracing::info!("IS KM: {is_km} Max value: {max}");
+		max
+	}
+
+	pub fn get_min_value(&self, is_km: bool) -> f64 {
+		let mut min = 0.0;
+		for record in self.data.clone() {
+			if is_km && record.km < min {
+				min = record.km;
+			} else if record.price < min {
+				min = record.price;
+			}
+		}
+		tracing::info!("IS KM: {is_km} Min value: {min}");
+		min
+	}
+
+	pub fn get_vector_of_tuples(&self) -> Vec<(f64, f64)> {
+		let mut vector = Vec::new();
+		for record in self.data.clone() {
+			vector.push((record.km, record.price));
+		}
+		vector
+	}
 }
 
 impl IntoIterator for DataSet {

@@ -34,10 +34,11 @@ fn do_main(options: Options) -> Result<(), ()> {
 
 	let data = DataSet::new(data);
 
-	let mut linear_regression = LinearRegression::new(data, None, config.gradient_descent_iterations);
+	let mut linear_regression = LinearRegression::new(data, None, config.gradient_descent_iterations, config.graph_path);
 
 	linear_regression.train();
 
 	linear_regression.save_thetas_to_file(&config.path_to_save_thetas_file)?;
-    Ok(())
+
+	linear_regression.plot_data()
 }

@@ -1,4 +1,5 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use plotters::prelude::*;
 
 use crate::{data::DataSet, utils::save_contents_to_file};
 
@@ -9,21 +10,23 @@ pub struct LinearRegression {
 	theta_zero: f64,
 	theta_one: f64,
 	gradient_descent_iterations: usize,
+	graph_path: PathBuf,
 }
 
 impl LinearRegression {
-	pub fn new(data: DataSet, alpha: Option<f64>, gradient_descent_iterations: usize) -> Self {
+	pub fn new(data: DataSet, alpha: Option<f64>, gradient_descent_iterations: usize, graph_path: PathBuf) -> Self {
 		Self {
 			m: data.len(),
 			data: data,
 			alpha: if let Some(alpha) = alpha {
 				alpha
 			} else {
-				0.01
+				0.00000000001
 			},
-			theta_zero: 0.0,
-			theta_one: 0.0,
+			theta_zero: 10000.0,
+			theta_one: -0.055,
 			gradient_descent_iterations,
+			graph_path,
 		}
 	}
 
@@ -39,7 +42,9 @@ impl LinearRegression {
 	}
 
 	pub fn predict(&self, x: f64) -> f64 {
-		self.hypothesis(x)
+		let res = self.hypothesis(x);
+		tracing::info!("x: {x}, hypothesis: {}", res);
+		res
 	}
 
 	pub fn train(&mut self) {
@@ -61,21 +66,51 @@ impl LinearRegression {
 				sum += (x_hypothesis - y) * x;
 			}
 		}
-		(1.0 / (2.0 * self.m as f64)) * sum
+		(1.0 / (self.m as f64)) * sum
 	}
 
 	fn gradient_descent(&mut self) {
-		let mut theta_zero = self.theta_zero;
-		let mut theta_one = self.theta_one;
 		for i in 0..self.gradient_descent_iterations {
-			let temp_zero = theta_zero - self.alpha * self.cost(true);
-			let temp_one = theta_one - self.alpha * self.cost(false);
-			theta_zero = temp_zero;
-			theta_one = temp_one;
-			tracing::info!("iteration: {i}\ntheta_zero: {}\ntheta_one: {}", theta_zero, theta_one);
+			let temp_zero = self.theta_zero - self.alpha * self.cost(true);
+			let temp_one = self.theta_one - self.alpha * self.cost(false);
+			self.theta_zero = temp_zero;
+			self.theta_one = temp_one;
+			tracing::info!("iteration: {i}\ntheta_zero: {}\ntheta_one: {}", self.theta_zero, self.theta_one);
 		}
-		self.theta_zero = theta_zero;
-		self.theta_one = theta_one;
 		tracing::info!("theta_zero_final_value: {}\ntheta_one_final_value: {}", self.theta_zero, self.theta_one)
+	}
+
+	pub fn plot_data(&self) -> Result<(), ()> {
+		let root = BitMapBackend::new(&self.graph_path, (640, 480)).into_drawing_area();
+		root.fill(&WHITE).map_err(|e| tracing::error!("Error filling plot: {e}"))?;
+
+		let mut chart = ChartBuilder::on(&root)
+			.caption("x=km, y=price", ("sans-serif", 50).into_font())
+			.margin(5)
+			.x_label_area_size(100)
+			.y_label_area_size(100)
+			.build_cartesian_2d(self.data.get_min_value(true)..(self.data.get_max_value(true) * 1.2), self.data.get_min_value(false)..(self.data.get_max_value(false) * 1.2))
+			.map_err(|e| tracing::error!("Error setting plot data boundaries: {e}"))?;
+
+		chart.configure_mesh().draw().map_err(|e| tracing::error!("Error drawing to plot: {e}"))?;
+
+		chart.draw_series(PointSeries::of_element(
+			self.data.get_vector_of_tuples(),
+			2,
+			&RED,
+			&|c, s, st| {
+				return EmptyElement::at(c)    // We want to construct a composed element on-the-fly
+				+ Circle::new((0,0),s,st.filled());
+			},
+		)).map_err(|e| tracing::error!("Error: {e}"))?;
+
+
+		chart.draw_series(LineSeries::new(
+			self.data.get_vector_of_tuples().iter().map(|(x, _)| (*x, self.predict(*x))),
+			&BLUE,
+		)).map_err(|e| tracing::error!("Error: {e}"))?;
+		root.present().map_err(|e| tracing::error!("Error printing graph: {e}"))?;
+
+		Ok(())
 	}
 }

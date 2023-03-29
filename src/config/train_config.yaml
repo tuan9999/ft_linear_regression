@@ -1,3 +1,4 @@
-path: "/Users/tuanperera/Documents/42/linear_regression/src/data/train.csv"
-path_to_save_thetas_file: "/Users/tuanperera/Documents/42/linear_regression/src/data/thetas.yaml"
+path: "./src/data/train.csv"
+path_to_save_thetas_file: "./src/data/thetas.yaml"
 gradient_descent_iterations: 1000
+graph_path: "./graphs/graph.png"

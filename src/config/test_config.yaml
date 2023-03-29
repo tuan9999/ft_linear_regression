@@ -1,2 +1,3 @@
-path_to_save_thetas_file: "/Users/tuanperera/Documents/42/linear_regression/src/data/thetas.yaml"
-path_to_test_file: "/Users/tuanperera/Documents/42/linear_regression/src/data/test.csv"
+path_to_save_thetas_file: "./src/data/thetas.yaml"
+path_to_test_file: "./src/data/test.csv"
+graph_path: "./graphs/graph.png"
